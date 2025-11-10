@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test_app/utils/camera_utils.dart';
-import 'package:flutter_test_app/utils/loader.dart';
-import 'package:flutter_test_app/utils/material_utils.dart';
 import 'package:three_js/three_js.dart' as three;
 import 'package:three_js_controls/three_js_controls.dart';
 
@@ -10,15 +8,13 @@ import 'package:three_js_controls/three_js_controls.dart';
 // 카메라 설정 상수
 // ============================================================================
 /// 카메라 시야각 (Field of View)
-const double _kCameraFov = 75.0;
+const double _kCameraFov = 50.0;
 
 /// 카메라 near plane (가까운 클리핑 평면)
 const double _kCameraNear = 0.1;
 
 /// 카메라 far plane (먼 클리핑 평면)
 const double _kCameraFar = 1000.0;
-const String _kDefaultSessionId = '1';
-const String _kDefaultTextureFileName = 'Rgb_F.jpg';
 
 const Color _kBackgroundColor = Colors.white;
 
