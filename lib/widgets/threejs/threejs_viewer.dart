@@ -43,13 +43,12 @@ class ThreejsViewer extends StatefulWidget {
 
 class _ThreejsViewerState extends State<ThreejsViewer> {
   bool _isLoaded = false;
-  late three.ThreeJS threeJs;
-  late Widget _viewer;
+  late three.ThreeJS _threeJs;
 
   @override
   void initState() {
     super.initState();
-    threeJs = three.ThreeJS(
+    _threeJs = three.ThreeJS(
       onSetupComplete: () {
         print('set up complete');
         if (mounted) {
@@ -58,22 +57,35 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
       },
       setup: _setupScene,
     );
-    _viewer = threeJs.build();
+  }
+
+  @override
+  void dispose() {
+    _threeJs.dispose();
+    super.dispose();
   }
 
   /// 3D 씬 설정
   Future<void> _setupScene() async {
     // 씬 생성 및 배경색 설정
     print('setup scene');
-    threeJs.scene = three.Scene();
-    threeJs.scene.background = three.Color.fromHex32(
+    _threeJs.scene = three.Scene();
+    _threeJs.scene.background = three.Color.fromHex32(
       widget.backgroundColor.value,
     );
 
+    // 조명 추가
+    final ambientLight = three.AmbientLight(0xffffff, 0.5);
+    _threeJs.scene.add(ambientLight);
+
+    final directionalLight = three.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.setValues(5, 5, 5);
+    _threeJs.scene.add(directionalLight);
+
     // 카메라 설정
-    threeJs.camera = three.PerspectiveCamera(
+    _threeJs.camera = three.PerspectiveCamera(
       _kCameraFov,
-      threeJs.width / threeJs.height,
+      _threeJs.width / _threeJs.height,
       _kCameraNear,
       _kCameraFar,
     );
@@ -82,7 +94,7 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
 
     final obj = await loadObjFileBySessionId(sessionId);
     if (obj != null) {
-      threeJs.scene.add(obj);
+      _threeJs.scene.add(obj);
     }
     final texture = await loadTextureFileBySessionId(
       sessionId,
@@ -101,28 +113,23 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
     if (obj != null) {
       fitCameraToObject(
         obj,
-        threeJs.camera as three.PerspectiveCamera,
-        threeJs.width,
-        threeJs.height,
+        _threeJs.camera as three.PerspectiveCamera,
+        _threeJs.width,
+        _threeJs.height,
       );
     } else {
       final camPos = widget.cameraPosition ?? three.Vector3(0, 0, 5);
-      threeJs.camera.position.setValues(camPos.x, camPos.y, camPos.z);
+      _threeJs.camera.position.setValues(camPos.x, camPos.y, camPos.z);
     }
   }
 
   @override
-  void dispose() {
-    threeJs.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    print('build');
     return Stack(
       children: [
         // Three.js 뷰어
-        _viewer,
+        _threeJs.build(),
         // 로딩 오버레이
         if (!_isLoaded)
           Container(

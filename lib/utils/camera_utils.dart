@@ -75,7 +75,11 @@ void fitCameraToObject(
       math.tan(effectiveFov / 2) *
       distanceMultiplier;
 
-  // 7. 카메라가 obj 중심을 바라보도록 설정
+  // 7. 카메라를 obj 중심점을 바라보도록 배치
+  // z축으로 거리만큼 떨어진 위치에 배치
+  camera.position.setValues(center.x, center.y, center.z + cameraDistance);
+
+  // 8. 카메라가 obj 중심을 바라보도록 설정
   camera.lookAt(center);
 
   print('Object center: ${center.x}, ${center.y}, ${center.z}');
