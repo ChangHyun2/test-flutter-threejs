@@ -43,6 +43,9 @@ dependencies:
 
   # State Management
   flutter_riverpod: ^2.6.1
+  three_js_simple_loaders: ^0.2.2
+  three_js_core_loaders: ^0.2.1
+  three_js_controls: ^0.2.2
 
 dev_dependencies:
   flutter_test:

@@ -4,6 +4,7 @@ import 'package:flutter_test_app/utils/camera_utils.dart';
 import 'package:flutter_test_app/utils/loader.dart';
 import 'package:flutter_test_app/utils/material_utils.dart';
 import 'package:three_js/three_js.dart' as three;
+import 'package:three_js_controls/three_js_controls.dart';
 
 // ============================================================================
 // 카메라 설정 상수
@@ -19,23 +20,14 @@ const double _kCameraFar = 1000.0;
 const String _kDefaultSessionId = '1';
 const String _kDefaultTextureFileName = 'Rgb_F.jpg';
 
+const Color _kBackgroundColor = Colors.white;
+
 /// Three.js 3D 뷰어 위젯
 class ThreejsViewer extends StatefulWidget {
-  /// 배경색
-  final Color backgroundColor;
+  final three.Object3D object;
+  final three.Texture texture;
 
-  /// 카메라 초기 위치
-  final three.Vector3? cameraPosition;
-
-  /// 회전 속도
-  final double rotationSpeed;
-
-  const ThreejsViewer({
-    super.key,
-    this.backgroundColor = Colors.black87,
-    this.cameraPosition,
-    this.rotationSpeed = 0.01,
-  });
+  const ThreejsViewer({super.key, required this.texture, required this.object});
 
   @override
   State<ThreejsViewer> createState() => _ThreejsViewerState();
@@ -44,9 +36,11 @@ class ThreejsViewer extends StatefulWidget {
 class _ThreejsViewerState extends State<ThreejsViewer> {
   bool _isLoaded = false;
   late three.ThreeJS _threeJs;
+  OrbitControls? _controls;
 
   @override
   void initState() {
+    print('initState');
     super.initState();
     _threeJs = three.ThreeJS(
       onSetupComplete: () {
@@ -61,8 +55,24 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
 
   @override
   void dispose() {
+    _controls?.dispose();
     _threeJs.dispose();
     super.dispose();
+  }
+
+  _applyTextureToObject(three.Object3D obj, three.Texture texture) {
+    texture.colorSpace = three.SRGBColorSpace;
+    texture.needsUpdate = true;
+
+    final material = three.MeshBasicMaterial();
+    material.map = texture;
+    material.needsUpdate = true;
+
+    obj.traverse((child) {
+      if (child is three.Mesh) {
+        child.material = material;
+      }
+    });
   }
 
   /// 3D 씬 설정
@@ -70,17 +80,19 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
     // 씬 생성 및 배경색 설정
     print('setup scene');
     _threeJs.scene = three.Scene();
-    _threeJs.scene.background = three.Color.fromHex32(
-      widget.backgroundColor.value,
-    );
+    _threeJs.scene.background = three.Color.fromHex32(_kBackgroundColor.value);
 
-    // 조명 추가
-    final ambientLight = three.AmbientLight(0xffffff, 0.5);
+    // 조명 추가 - 더 밝고 입체감 있게
+    final ambientLight = three.AmbientLight(0xffffff, 0.6);
     _threeJs.scene.add(ambientLight);
 
-    final directionalLight = three.DirectionalLight(0xffffff, 0.8);
-    directionalLight.position.setValues(5, 5, 5);
-    _threeJs.scene.add(directionalLight);
+    final directionalLight1 = three.DirectionalLight(0xffffff, 0.8);
+    directionalLight1.position.setValues(5, 5, 5);
+    _threeJs.scene.add(directionalLight1);
+
+    final directionalLight2 = three.DirectionalLight(0xffffff, 0.4);
+    directionalLight2.position.setValues(-5, -5, -5);
+    _threeJs.scene.add(directionalLight2);
 
     // 카메라 설정
     _threeJs.camera = three.PerspectiveCamera(
@@ -90,37 +102,25 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
       _kCameraFar,
     );
 
-    final sessionId = _kDefaultSessionId;
-
-    final obj = await loadObjFileBySessionId(sessionId);
-    if (obj != null) {
-      _threeJs.scene.add(obj);
-    }
-    final texture = await loadTextureFileBySessionId(
-      sessionId,
-      _kDefaultTextureFileName,
-    );
-
-    print('texture: $texture');
-    print('obj: $obj');
-
-    // obj가 존재하고 texture가 로드된 경우, obj의 모든 Mesh에 텍스처를 적용
-    if (obj != null && texture != null) {
-      applyTextureToObject(obj, texture);
-    }
+    _applyTextureToObject(widget.object, widget.texture);
+    _threeJs.scene.add(widget.object);
 
     // obj가 있으면 자동으로 카메라를 맞춤, 없으면 기본 위치 사용
-    if (obj != null) {
-      fitCameraToObject(
-        obj,
-        _threeJs.camera as three.PerspectiveCamera,
-        _threeJs.width,
-        _threeJs.height,
-      );
-    } else {
-      final camPos = widget.cameraPosition ?? three.Vector3(0, 0, 5);
-      _threeJs.camera.position.setValues(camPos.x, camPos.y, camPos.z);
-    }
+    fitCameraToObject(
+      widget.object,
+      _threeJs.camera as three.PerspectiveCamera,
+      _threeJs.width,
+      _threeJs.height,
+    );
+
+    // OrbitControls 설정 - 마우스로 회전/줌 가능
+    _controls = OrbitControls(_threeJs.camera, _threeJs.globalKey);
+    _controls!.enableDamping = true;
+    _controls!.dampingFactor = 0.15;
+    _controls!.screenSpacePanning = false;
+    _controls!.minDistance = 80;
+    _controls!.maxDistance = 500;
+    _controls!.maxPolarAngle = 3.14159265359; // PI
   }
 
   @override
@@ -133,7 +133,7 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
         // 로딩 오버레이
         if (!_isLoaded)
           Container(
-            color: widget.backgroundColor,
+            color: _kBackgroundColor,
             child: const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

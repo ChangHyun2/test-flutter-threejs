@@ -374,7 +374,7 @@ packages:
     source: hosted
     version: "0.2.1"
   three_js_controls:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: three_js_controls
       sha256: "4cc52d53e3bf1cca0d469c5f200b10c5c96954663d551bdb6b0b4278a0dca148"
@@ -390,7 +390,7 @@ packages:
     source: hosted
     version: "0.2.6"
   three_js_core_loaders:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: three_js_core_loaders
       sha256: "85ca58d66b57b94acb5b4598e97ebd54a1679025f4eaf8cfa2dade4b561b2189"
@@ -430,7 +430,7 @@ packages:
     source: hosted
     version: "0.1.2"
   three_js_simple_loaders:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: three_js_simple_loaders
       sha256: "3728e84dd74cf68fbf7b6260d5eda47afbcddc48dd7b127a56fef85d92b87c78"
