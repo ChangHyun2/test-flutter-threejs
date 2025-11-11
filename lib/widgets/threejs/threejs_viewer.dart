@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_test_app/utils/camera_utils.dart';
+import 'package:flutter_test_app/utils/threejs/camera_sync_controller.dart';
 import 'package:three_js/three_js.dart' as three;
 import 'package:three_js_controls/three_js_controls.dart';
 
@@ -25,52 +26,6 @@ class ThreejsViewerItem {
   ThreejsViewerItem({required this.object, required this.isFigure});
 }
 
-// ============================================================================
-// 카메라 동기화 컨트롤러
-// ============================================================================
-
-/// 카메라 상태를 담는 데이터 클래스
-class CameraState {
-  final three.Vector3 position;
-  final three.Vector3 target;
-  final double zoom;
-
-  CameraState({
-    required this.position,
-    required this.target,
-    required this.zoom,
-  });
-
-  CameraState copyWith({
-    three.Vector3? position,
-    three.Vector3? target,
-    double? zoom,
-  }) {
-    return CameraState(
-      position: position ?? this.position.clone(),
-      target: target ?? this.target.clone(),
-      zoom: zoom ?? this.zoom,
-    );
-  }
-}
-
-/// 여러 뷰어 간 카메라를 동기화하는 컨트롤러
-class CameraSyncController {
-  final _controller = StreamController<CameraState>.broadcast();
-  Stream<CameraState> get stream => _controller.stream;
-
-  /// 카메라 상태 변경을 브로드캐스트
-  void updateCamera(CameraState state) {
-    if (!_controller.isClosed) {
-      _controller.add(state);
-    }
-  }
-
-  void dispose() {
-    _controller.close();
-  }
-}
-
 /// Three.js 3D 뷰어 위젯
 class ThreejsViewer extends StatefulWidget {
   final List<ThreejsViewerItem> items;
@@ -88,8 +43,6 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
   OrbitControls? _controls;
   StreamSubscription<CameraState>? _syncSubscription;
   Timer? _syncTimer;
-  bool _isUpdatingFromSync = false; // 동기화로 인한 업데이트 중인지 플래그
-  CameraState? _lastCameraState; // 마지막으로 전송한 카메라 상태
 
   @override
   void initState() {
@@ -113,10 +66,8 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
     if (widget.syncController != null) {
       // 다른 뷰어의 카메라 변경사항을 구독
       _syncSubscription = widget.syncController!.stream.listen((state) {
-        if (!_isUpdatingFromSync && _controls != null && mounted) {
-          _isUpdatingFromSync = true;
+        if (_controls != null && mounted) {
           _applyCameraState(state);
-          _isUpdatingFromSync = false;
         }
       });
     }
@@ -190,7 +141,7 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
         return;
       }
 
-      if (!_isUpdatingFromSync && widget.syncController != null) {
+      if (widget.syncController != null) {
         _controls!.update();
         _notifyCameraChange();
       }
@@ -205,41 +156,8 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
     final position = camera.position.clone();
     final target = _controls!.target.clone();
     final zoom = camera.zoom;
-
     final state = CameraState(position: position, target: target, zoom: zoom);
-
-    // 변경사항이 있을 때만 전송 (성능 최적화)
-    if (_lastCameraState == null ||
-        _hasCameraChanged(_lastCameraState!, state)) {
-      _lastCameraState = state;
-      widget.syncController!.updateCamera(state);
-    }
-  }
-
-  /// 카메라 상태가 변경되었는지 확인
-  bool _hasCameraChanged(CameraState oldState, CameraState newState) {
-    const threshold = 0.001; // 작은 변화는 무시
-
-    // 위치 변경 확인
-    if ((oldState.position.x - newState.position.x).abs() > threshold ||
-        (oldState.position.y - newState.position.y).abs() > threshold ||
-        (oldState.position.z - newState.position.z).abs() > threshold) {
-      return true;
-    }
-
-    // 타겟 변경 확인
-    if ((oldState.target.x - newState.target.x).abs() > threshold ||
-        (oldState.target.y - newState.target.y).abs() > threshold ||
-        (oldState.target.z - newState.target.z).abs() > threshold) {
-      return true;
-    }
-
-    // 줌 변경 확인
-    if ((oldState.zoom - newState.zoom).abs() > threshold) {
-      return true;
-    }
-
-    return false;
+    widget.syncController!.updateCamera(state);
   }
 
   /// 동기화된 카메라 상태를 현재 뷰어에 적용

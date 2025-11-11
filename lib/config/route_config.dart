@@ -61,6 +61,13 @@ class Routes {
     title: 'Transparent Gray Test',
   );
 
+  static const objToGltf = RouteInfo(
+    path: '/obj-to-gltf',
+    name: 'obj-to-gltf',
+    icon: Icons.transform,
+    title: 'OBJ to glTF',
+  );
+
   /// 메뉴에 표시할 라우트 목록
   static const List<RouteInfo> menuRoutes = [
     dashboard,
@@ -69,5 +76,6 @@ class Routes {
     acne,
     threejsPoolUsageExample,
     testTransparentGray,
+    objToGltf,
   ];
 }

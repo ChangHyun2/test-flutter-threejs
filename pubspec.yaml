@@ -47,6 +47,9 @@ dependencies:
   three_js_core_loaders: ^0.2.1
   three_js_controls: ^0.2.2
   three_js_advanced_loaders: ^0.2.4
+  
+  # Path manipulation
+  path: ^1.9.0
 
 dev_dependencies:
   flutter_test:

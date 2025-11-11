@@ -8,6 +8,7 @@ import 'screens/acne_screen.dart';
 import 'widgets/layout/main_layout.dart';
 import 'screens/threejs_pool_usage_example.dart';
 import 'screens/test_transparent_gray_screen.dart';
+import 'screens/obj_to_gltf_screen.dart';
 import 'widgets/sessions/sessions_list.dart';
 import 'mock/sessions.dart';
 
@@ -69,6 +70,14 @@ final GoRouter appRouter = GoRouter(
           pageBuilder: (context, state) => NoTransitionPage(
             key: state.pageKey,
             child: const TestTransparentGrayScreen(),
+          ),
+        ),
+        GoRoute(
+          path: Routes.objToGltf.path,
+          name: Routes.objToGltf.name,
+          pageBuilder: (context, state) => NoTransitionPage(
+            key: state.pageKey,
+            child: const ObjToGltfScreen(),
           ),
         ),
       ],
