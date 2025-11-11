@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test_app/utils/threejs/texture/flipY.dart';
 import 'package:flutter_test_app/widgets/threejs/threejs_viewer.dart';
 import 'package:flutter_test_app/utils/loader.dart';
 import 'package:flutter_test_app/utils/material_utils.dart';
 
-class HistoricalScreen extends StatelessWidget {
+class HistoricalScreen extends StatefulWidget {
   const HistoricalScreen({super.key});
+
+  @override
+  State<HistoricalScreen> createState() => _HistoricalScreenState();
+}
+
+class _HistoricalScreenState extends State<HistoricalScreen> {
+  final CameraSyncController _cameraSyncController = CameraSyncController();
+
+  @override
+  void dispose() {
+    _cameraSyncController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,11 +93,13 @@ class HistoricalScreen extends StatelessWidget {
               Expanded(
                 child: ThreejsViewer(
                   items: [ThreejsViewerItem(object: obj, isFigure: true)],
+                  syncController: _cameraSyncController,
                 ),
               ),
               Expanded(
                 child: ThreejsViewer(
                   items: [ThreejsViewerItem(object: obj2, isFigure: true)],
+                  syncController: _cameraSyncController,
                 ),
               ),
             ],
