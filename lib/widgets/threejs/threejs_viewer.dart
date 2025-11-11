@@ -18,12 +18,18 @@ const double _kCameraFar = 1000.0;
 
 const Color _kBackgroundColor = Colors.white;
 
+class ThreejsViewerItem {
+  final three.Object3D object;
+  final bool isFigure;
+
+  ThreejsViewerItem({required this.object, required this.isFigure});
+}
+
 /// Three.js 3D 뷰어 위젯
 class ThreejsViewer extends StatefulWidget {
-  final three.Object3D object;
-  final three.Texture texture;
+  final List<ThreejsViewerItem> items;
 
-  const ThreejsViewer({super.key, required this.texture, required this.object});
+  const ThreejsViewer({super.key, required this.items});
 
   @override
   State<ThreejsViewer> createState() => _ThreejsViewerState();
@@ -43,6 +49,7 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
         print('set up complete');
         if (mounted) {
           setState(() => _isLoaded = true);
+          _draw();
         }
       },
       setup: _setupScene,
@@ -50,25 +57,17 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
   }
 
   @override
+  void didUpdateWidget(ThreejsViewer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('did update widget');
+    _draw();
+  }
+
+  @override
   void dispose() {
     _controls?.dispose();
     _threeJs.dispose();
     super.dispose();
-  }
-
-  _applyTextureToObject(three.Object3D obj, three.Texture texture) {
-    texture.colorSpace = three.SRGBColorSpace;
-    texture.needsUpdate = true;
-
-    final material = three.MeshBasicMaterial();
-    material.map = texture;
-    material.needsUpdate = true;
-
-    obj.traverse((child) {
-      if (child is three.Mesh) {
-        child.material = material;
-      }
-    });
   }
 
   /// 3D 씬 설정
@@ -98,17 +97,6 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
       _kCameraFar,
     );
 
-    _applyTextureToObject(widget.object, widget.texture);
-    _threeJs.scene.add(widget.object);
-
-    // obj가 있으면 자동으로 카메라를 맞춤, 없으면 기본 위치 사용
-    fitCameraToObject(
-      widget.object,
-      _threeJs.camera as three.PerspectiveCamera,
-      _threeJs.width,
-      _threeJs.height,
-    );
-
     // OrbitControls 설정 - 마우스로 회전/줌 가능
     _controls = OrbitControls(_threeJs.camera, _threeJs.globalKey);
     _controls!.enableDamping = true;
@@ -117,6 +105,21 @@ class _ThreejsViewerState extends State<ThreejsViewer> {
     _controls!.minDistance = 80;
     _controls!.maxDistance = 500;
     _controls!.maxPolarAngle = 3.14159265359; // PI
+  }
+
+  void _draw() {
+    widget.items.forEach((item) {
+      _threeJs.scene.add(item.object);
+
+      if (item.isFigure) {
+        fitCameraToObject(
+          item.object,
+          _threeJs.camera as three.PerspectiveCamera,
+          _threeJs.width,
+          _threeJs.height,
+        );
+      }
+    });
   }
 
   @override

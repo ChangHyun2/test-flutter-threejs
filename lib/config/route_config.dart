@@ -54,6 +54,13 @@ class Routes {
     title: 'ThreeJS Pool',
   );
 
+  static const testTransparentGray = RouteInfo(
+    path: '/test-transparent-gray',
+    name: 'test-transparent-gray',
+    icon: Icons.layers,
+    title: 'Transparent Gray Test',
+  );
+
   /// 메뉴에 표시할 라우트 목록
   static const List<RouteInfo> menuRoutes = [
     dashboard,
@@ -61,5 +68,6 @@ class Routes {
     simulation,
     acne,
     threejsPoolUsageExample,
+    testTransparentGray,
   ];
 }
