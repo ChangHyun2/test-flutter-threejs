@@ -13,6 +13,9 @@ const execAsync = promisify(exec);
  * @returns {Promise<string>} - 출력 파일 경로를 반환하는 Promise
  */
 async function convertObjToGltf(inputPath, outputPath = null, options = {}) {
+  // 변환 시작 시간 측정
+  const startTime = process.hrtime.bigint();
+  
   try {
     // 입력 파일 경로 검증
     if (!fs.existsSync(inputPath)) {
@@ -70,10 +73,25 @@ async function convertObjToGltf(inputPath, outputPath = null, options = {}) {
       console.warn(stderr);
     }
 
+    // 변환 완료 시간 측정
+    const endTime = process.hrtime.bigint();
+    const durationNs = endTime - startTime;
+    const durationMs = Number(durationNs) / 1000000; // 나노초를 밀리초로 변환
+    const durationSec = durationMs / 1000; // 밀리초를 초로 변환
+
     console.log(`Successfully converted ${inputPath} to ${outputPath}`);
+    console.log(`변환 소요 시간: ${durationMs.toFixed(2)}ms (${durationSec.toFixed(2)}s)`);
+    
     return outputPath;
   } catch (error) {
+    // 에러 발생 시에도 시간 측정
+    const endTime = process.hrtime.bigint();
+    const durationNs = endTime - startTime;
+    const durationMs = Number(durationNs) / 1000000;
+    const durationSec = durationMs / 1000;
+    
     console.error(`Error converting OBJ to glTF: ${error.message}`);
+    console.error(`실패까지 소요 시간: ${durationMs.toFixed(2)}ms (${durationSec.toFixed(2)}s)`);
     throw error;
   }
 }
@@ -92,12 +110,27 @@ if (require.main === module) {
   const inputFile = path.resolve(args[0]);
   const outputFile = args[1] ? path.resolve(args[1]) : null;
 
+  // 전체 실행 시간 측정 (CLI 모드)
+  const cliStartTime = process.hrtime.bigint();
+  
   convertObjToGltf(inputFile, outputFile)
     .then((outputPath) => {
+      const cliEndTime = process.hrtime.bigint();
+      const cliDurationNs = cliEndTime - cliStartTime;
+      const cliDurationMs = Number(cliDurationNs) / 1000000;
+      const cliDurationSec = cliDurationMs / 1000;
+      
       console.log(`Conversion completed: ${outputPath}`);
+      console.log(`전체 실행 시간: ${cliDurationMs.toFixed(2)}ms (${cliDurationSec.toFixed(2)}s)`);
     })
     .catch((error) => {
+      const cliEndTime = process.hrtime.bigint();
+      const cliDurationNs = cliEndTime - cliStartTime;
+      const cliDurationMs = Number(cliDurationNs) / 1000000;
+      const cliDurationSec = cliDurationMs / 1000;
+      
       console.error(`Conversion failed:`, error);
+      console.error(`전체 실행 시간: ${cliDurationMs.toFixed(2)}ms (${cliDurationSec.toFixed(2)}s)`);
       process.exit(1);
     });
 }
