@@ -46,6 +46,7 @@ dependencies:
   three_js_simple_loaders: ^0.2.2
   three_js_core_loaders: ^0.2.1
   three_js_controls: ^0.2.2
+  three_js_advanced_loaders: ^0.2.4
 
 dev_dependencies:
   flutter_test:
@@ -70,15 +71,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/1/model.obj
-    - assets/2/model.obj
-    - assets/3/model.obj
-    - assets/1/Red_F.jpg
-    - assets/2/Red_F.jpg
-    - assets/3/Red_F.jpg
-    - assets/1/Rgb_F.jpg
-    - assets/2/Rgb_F.jpg
-    - assets/3/Rgb_F.jpg
+    - assets/1/
+    - assets/2/
+    - assets/3/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

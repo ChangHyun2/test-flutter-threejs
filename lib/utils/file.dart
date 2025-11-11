@@ -11,6 +11,13 @@ String getModelPathBySessionId(String sessionId) {
   return '$sessionId/model.obj';
 }
 
+String getGlftModelPathBySessionId(String sessionId) {
+  if (!['1', '2', '3'].contains(sessionId)) {
+    throw ArgumentError('Invalid session ID. Must be 1, 2, or 3');
+  }
+  return 'assets/$sessionId/result.gltf';
+}
+
 String getTexturePathBySessionId(String sessionId, String textureFileName) {
   if (!['1', '2', '3'].contains(sessionId)) {
     throw ArgumentError('Invalid session ID. Must be 1, 2, or 3');

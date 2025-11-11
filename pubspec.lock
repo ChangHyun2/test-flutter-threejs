@@ -358,7 +358,7 @@ packages:
     source: hosted
     version: "0.2.6"
   three_js_advanced_loaders:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: three_js_advanced_loaders
       sha256: "901ee356fba0ffe57547e448ee73aaa351b68a46608cf8f13c798b28980fbd38"

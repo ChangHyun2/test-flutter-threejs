@@ -26,6 +26,8 @@ three.Vector3 calculateObjectSize(three.Object3D obj) {
   box.setFromObject(obj);
   final size = three.Vector3(0, 0, 0);
   box.getSize(size);
+
+  print(box);
   return size;
 }
 
