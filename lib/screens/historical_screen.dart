@@ -38,12 +38,12 @@ class HistoricalScreen extends StatelessWidget {
             'loadTextureFileBySessionId($sessionId, $textureFileName)',
           ),
           measureTime(
-            loadObjFileBySessionId(sessionId2),
-            'loadObjFileBySessionId($sessionId2)',
+            loadObjFileBySessionId(sessionId),
+            'loadObjFileBySessionId($sessionId)',
           ),
           measureTime(
-            loadTextureFileBySessionId(sessionId2, textureFileName),
-            'loadTextureFileBySessionId($sessionId2, $textureFileName)',
+            loadTextureFileBySessionId(sessionId, textureFileName),
+            'loadTextureFileBySessionId($sessionId, $textureFileName)',
           ),
         ]).then((results) {
           stopwatch.stop();
