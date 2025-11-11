@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test_app/widgets/threejs/threejs_viewer.dart';
 import 'package:flutter_test_app/utils/loader.dart';
 import 'package:flutter_test_app/utils/material_utils.dart';
+import 'package:flutter_test_app/utils/threejs/camera_sync_controller.dart';
 
 class HistoricalScreen extends StatefulWidget {
   const HistoricalScreen({super.key});
@@ -11,7 +12,12 @@ class HistoricalScreen extends StatefulWidget {
 }
 
 class _HistoricalScreenState extends State<HistoricalScreen> {
-  final CameraSyncController _cameraSyncController = CameraSyncController();
+  late CameraSyncController _cameraSyncController;
+  @override
+  void initState() {
+    super.initState();
+    _cameraSyncController = CameraSyncController();
+  }
 
   @override
   void dispose() {
