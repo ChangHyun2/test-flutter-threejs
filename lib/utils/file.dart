@@ -15,7 +15,7 @@ String getGlftModelPathBySessionId(String sessionId) {
   if (!['1', '2', '3'].contains(sessionId)) {
     throw ArgumentError('Invalid session ID. Must be 1, 2, or 3');
   }
-  return 'assets/$sessionId/result.gltf';
+  return 'assets/$sessionId/model.gltf';
 }
 
 String getTexturePathBySessionId(String sessionId, String textureFileName) {

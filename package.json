@@ -1,0 +1,19 @@
+{
+  "name": "obj-to-gltf-converter",
+  "version": "1.0.0",
+  "description": "OBJ to glTF converter using obj2gltf",
+  "main": "objToGltf.js",
+  "scripts": {
+    "test": "node objToGltf.js"
+  },
+  "keywords": ["obj", "gltf", "converter"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "obj2gltf": "^3.1.0"
+  },
+  "resolutions": {
+    "cesium": "1.86.1"
+  }
+}
+
