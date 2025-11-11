@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:flutter_test_app/utils/loader.dart';
+import 'package:flutter_test_app/utils/threejs/object3d/mirrorYAxis.dart';
 import 'package:three_js_core/three_js_core.dart' as THREE;
 import 'package:three_js_simple_loaders/three_js_simple_loaders.dart'
     as SIMPLE_LOADERS;
@@ -172,8 +173,8 @@ class AssetsManager {
     final gltf = await loadGltfFileBySessionId(sessionId);
 
     if (gltf != null) {
+      mirrorYAxis(gltf);
       _gltfCache.put(cacheKey, gltf);
-
       return gltf.clone() as THREE.Group;
     }
 

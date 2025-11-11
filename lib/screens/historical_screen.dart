@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test_app/widgets/threejs/threejs_viewer.dart';
 import 'package:flutter_test_app/utils/loader.dart';
+import 'package:flutter_test_app/utils/material_utils.dart';
 
 class HistoricalScreen extends StatelessWidget {
   const HistoricalScreen({super.key});
@@ -36,12 +37,12 @@ class HistoricalScreen extends StatelessWidget {
             'loadTextureFileBySessionId($sessionId, $textureFileName)',
           ),
           measureTime(
-            loadObjFileBySessionId(sessionId2),
-            'loadObjFileBySessionId($sessionId2)',
+            loadObjFileBySessionId(sessionId),
+            'loadObjFileBySessionId($sessionId)',
           ),
           measureTime(
-            loadTextureFileBySessionId(sessionId2, textureFileName),
-            'loadTextureFileBySessionId($sessionId2, $textureFileName)',
+            loadTextureFileBySessionId(sessionId, textureFileName),
+            'loadTextureFileBySessionId($sessionId, $textureFileName)',
           ),
         ]).then((results) {
           stopwatch.stop();
@@ -59,18 +60,32 @@ class HistoricalScreen extends StatelessWidget {
             return const Center(child: Text('Error loading data'));
           }
 
+          final items1 = [];
+          final items2 = [];
+
           final obj = snapshot.data![0];
-          final texture = snapshot.data![1];
+          if (obj != null) {
+            applyTextureToObject(obj, snapshot.data![1], isFlipY: true);
+            items1.add(ThreejsViewerItem(object: obj, isFigure: true));
+          }
+
           final obj2 = snapshot.data![2];
-          final texture2 = snapshot.data![3];
+          if (obj2 != null) {
+            applyTextureToObject(obj2, snapshot.data![3]);
+            items2.add(ThreejsViewerItem(object: obj2, isFigure: true));
+          }
 
           return Row(
             children: [
               Expanded(
-                child: ThreejsViewer(object: obj, texture: texture),
+                child: ThreejsViewer(
+                  items: [ThreejsViewerItem(object: obj, isFigure: true)],
+                ),
               ),
               Expanded(
-                child: ThreejsViewer(object: obj2, texture: texture2),
+                child: ThreejsViewer(
+                  items: [ThreejsViewerItem(object: obj2, isFigure: true)],
+                ),
               ),
             ],
           );
